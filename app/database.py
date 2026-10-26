@@ -10,11 +10,13 @@ SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.
 
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
+# manages physical connection pool and talks to the database.
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# holds objects you read or modify during an operation. 
 
 Base = declarative_base()
-
+# maps python classes to table schemas. 
 
 def get_db():
     db = SessionLocal()

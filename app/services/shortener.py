@@ -5,8 +5,6 @@ from app.services.errors import InvalidShortCode, ShortCodeNotFound
 BASE62 = string.ascii_letters + string.digits
 BASE = len(BASE62) # gives 62 distinct characters: 26 + 26 + 10 = 62.
 
-_id_to_url: dict[int, str] = {}
-_url_to_id: dict[str, int] = {}
 _counter = 100000
 _lock = Lock()
 
