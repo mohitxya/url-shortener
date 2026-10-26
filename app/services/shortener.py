@@ -3,7 +3,7 @@ from threading import Lock
 from app.services.errors import InvalidShortCode, ShortCodeNotFound
 
 BASE62 = string.ascii_letters + string.digits
-BASE = len(BASE62)
+BASE = len(BASE62) # gives 62 distinct characters: 26 + 26 + 10 = 62.
 
 _id_to_url: dict[int, str] = {}
 _url_to_id: dict[str, int] = {}
@@ -36,6 +36,7 @@ def create_short_url(long_url: str) -> str:
     with _lock:
         if long_url in _url_to_id:
             return encode(_url_to_id[long_url])
+        # if not in database
         _counter += 1
         url_id = _counter
         _id_to_url[url_id] = long_url
