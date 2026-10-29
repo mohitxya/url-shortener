@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import router as api_router
+import time
+
 
 app = FastAPI(title="URL Shortener API")
 
@@ -14,6 +16,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.perf_counter()
+    # Pass the request down to the actual route handler:
+    response = await call_next(request)
+    # Calculate how long the route took in seconds:
+    process_time = time.perf_counter() - start_time
+    # Convert seconds to milliseconds (ms) with 2 decimal places and attach to headers:
+    response.headers["X-Process-Time"] = f"{process_time * 1000:.2f}ms"
+    return response
 
 @app.get("/")
 def read_root():

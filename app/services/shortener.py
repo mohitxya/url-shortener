@@ -2,7 +2,8 @@ import string
 from app.services.errors import InvalidShortCode, ShortCodeNotFound
 from sqlalchemy.orm import Session
 from app.models import URL
-
+from app.database import r
+from app.config import settings
 
 
 BASE62 = string.ascii_letters + string.digits
@@ -49,8 +50,12 @@ def create_short_url(long_url: str, db:Session) -> str:
 
 
 def get_long_url(short_code: str, db:Session) -> str:
+    cached_url = r.get(short_code)
+    if cached_url: 
+        return cached_url
     url_id = decode(short_code)
     url_record = db.query(URL).filter(URL.id == url_id).first()
     if not url_record:
         raise ShortCodeNotFound(f"Short code {short_code} not found")
+    r.setex(short_code, settings.redis_ttl_seconds, url_record.original_url)
     return url_record.original_url

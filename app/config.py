@@ -7,6 +7,9 @@ class Settings(BaseSettings):
     database_hostname: str 
     database_port: str 
     database_name: str 
+    redis_host: str 
+    redis_port: int 
+    redis_ttl_seconds:int 
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

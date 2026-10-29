@@ -5,6 +5,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
 from .config import settings
+import redis
 
 SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
 
@@ -17,6 +18,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 # maps python classes to table schemas. 
+
+r = redis.Redis(
+    host=settings.redis_host,
+    port=settings.redis_port,
+    decode_responses=True
+)
 
 def get_db():
     db = SessionLocal()
