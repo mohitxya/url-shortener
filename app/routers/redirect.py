@@ -9,9 +9,9 @@ router = APIRouter(tags=["Redirect"])
 
 
 @router.get("/{short_code}")
-def redirect(short_code: str, db:Session = Depends(get_db)):
+def redirect(short_code: str): #, db:Session = Depends(get_db)
     try:
-        long_url = shortener.get_long_url(short_code, db)
+        long_url = shortener.get_long_url(short_code)
     except (InvalidShortCode, ShortCodeNotFound):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Short URL not found")
     return RedirectResponse(url=long_url, status_code=302)
