@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import RedirectResponse
 from app.services import shortener
 from app.services.errors import InvalidShortCode, ShortCodeNotFound

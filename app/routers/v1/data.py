@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
 from app.schemas import URLResponse, URLCreate
 from app.services import shortener
 from sqlalchemy.orm import Session

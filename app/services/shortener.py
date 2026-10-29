@@ -1,12 +1,14 @@
 import string
-from threading import Lock
 from app.services.errors import InvalidShortCode, ShortCodeNotFound
+from sqlalchemy.orm import Session
+from app.models import URL
+
+
 
 BASE62 = string.ascii_letters + string.digits
 BASE = len(BASE62) # gives 62 distinct characters: 26 + 26 + 10 = 62.
 
-_counter = 100000
-_lock = Lock()
+
 
 
 def encode(num: int) -> str:
@@ -29,22 +31,26 @@ def decode(code: str) -> int:
     return num
 
 
-def create_short_url(long_url: str) -> str:
-    global _counter
-    with _lock:
-        if long_url in _url_to_id:
-            return encode(_url_to_id[long_url])
-        # if not in database
-        _counter += 1
-        url_id = _counter
-        _id_to_url[url_id] = long_url
-        _url_to_id[long_url] = url_id
-        return encode(url_id)
+def create_short_url(long_url: str, db:Session) -> str:
+    existing = db.query(URL).filter(URL.original_url == long_url).first()
+    if existing: 
+        return existing.short_url
+    
+    # too slow: count = db.query(URL).count()
+    new_url = URL(
+        original_url=long_url,
+    ) 
+    db.add(new_url)
+    db.flush() # assign id without commit
+    new_url.short_url = encode(new_url.id)
+    db.commit()
+    return new_url.short_url
+        
 
 
-def get_long_url(short_code: str) -> str:
+def get_long_url(short_code: str, db:Session) -> str:
     url_id = decode(short_code)
-    with _lock:
-        if url_id not in _id_to_url:
-            raise ShortCodeNotFound(f"Short code {short_code} not found")
-        return _id_to_url[url_id]
+    url_record = db.query(URL).filter(URL.id == url_id).first()
+    if not url_record:
+        raise ShortCodeNotFound(f"Short code {short_code} not found")
+    return url_record.original_url
