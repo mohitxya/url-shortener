@@ -8,7 +8,7 @@ from app.rate_limiter import rate_limiter
 router = APIRouter(prefix="/api/v1", tags=["Data"])
 
 
-@router.post("/data/shorten", response_model=URLResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(rate_limit(requests_limit=5, time_window=60))])
+@router.post("/data/shorten", response_model=URLResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(rate_limiter(limit=5, window=60))])
 def shorten(url: URLCreate, db:Session = Depends(get_db)):
     long_url = str(url.long_url)
     code = shortener.create_short_url(long_url, db)
