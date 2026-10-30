@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     redis_host: str 
     redis_port: int 
     redis_ttl_seconds:int 
+    rate_limit_requests: int 
+    rate_limit_window_seconds: int
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
